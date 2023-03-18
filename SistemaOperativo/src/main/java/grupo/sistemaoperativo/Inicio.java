@@ -33,6 +33,7 @@ public class Inicio {
         if(users.length()==0){
             users.writeUTF("PotasticPanda");
             users.writeUTF("123456789");
+            
             CreateUserFolder("PotasticPanda");
         }
     }
@@ -66,6 +67,7 @@ public class Inicio {
                 return true;
             }
             users.readUTF();
+            users.readBoolean();
         }
         return false;
     }
@@ -76,7 +78,8 @@ public class Inicio {
             String pass=users.readUTF();
             if(user.equals(nombre) && pass.equals(password)){
                 return true;
-            }            
+            }           
+            users.readBoolean();
         }
         return false;
     }
