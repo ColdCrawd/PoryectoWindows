@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package grupo.sistemaoperativo;
 
 import java.io.File;
@@ -14,71 +10,82 @@ import java.io.RandomAccessFile;
  * @author w
  */
 public class Inicio {
+
     private RandomAccessFile users;
-    
+
     public Inicio() {
         try {
             File mi = new File("z");
             mi.mkdir();
-            File mu=new File("z/users");
+            File mu = new File("z/users");
             mu.mkdir();
-            users=new RandomAccessFile("z/users/Usuarios.usr","rw");
+            users = new RandomAccessFile("z/users/Usuarios.usr", "rw");
             Createadmin();
-            
-        }catch(IOException e){
-            
+
+        } catch (IOException e) {
+
         }
     }
-    public void Createadmin() throws IOException{
-        if(users.length()==0){
+
+    public void Createadmin() throws IOException {
+        if (users.length() == 0) {
             users.writeUTF("PotasticPanda");
             users.writeUTF("123456789");
-            
             CreateUserFolder("PotasticPanda");
+            users.writeBoolean(true);
+
         }
     }
-    public void addUser(String user, String password) throws IOException{
+
+    public void addUser(String user, String password) throws IOException {
         users.seek(users.length());
         users.writeUTF(user);
         users.writeUTF(password);
         CreateUserFolder(user);
+        users.writeBoolean(false);
+
     }
-    public String UsersFolder(String user){
-        return "z/users/"+user;
+
+    public String UsersFolder(String user) {
+        return "z/users/" + user;
     }
-    public void CreateUserFolder(String user)throws IOException{
-        File U=new File(UsersFolder(user));
+
+    public void CreateUserFolder(String user) throws IOException {
+        File U = new File(UsersFolder(user));
         U.mkdir();
         CrearCarpetas(UsersFolder(user));
     }
-    public void CrearCarpetas(String direccion)throws IOException{
-        File Imagenes=new File(direccion+"/MisImagenes");
+
+    public void CrearCarpetas(String direccion) throws IOException {
+        File Imagenes = new File(direccion + "/MisImagenes");
         Imagenes.mkdir();
-        File Documentos=new File(direccion+"/MisDocumentos");
+        File Documentos = new File(direccion + "/MisDocumentos");
         Documentos.mkdir();
-        File Musica=new File(direccion+"/Musica");
+        File Musica = new File(direccion + "/Musica");
         Musica.mkdir();
     }
-    public boolean existe(String nombre) throws IOException{
+
+    public boolean existe(String nombre) throws IOException {
         users.seek(0);
-        while(users.getFilePointer()<users.length()){
-            String user=users.readUTF();
-            if(user.equals(nombre)){
+        while (users.getFilePointer() < users.length()) {
+            String user = users.readUTF();
+            if (user.equals(nombre)) {
                 return true;
             }
             users.readUTF();
-            users.readBoolean();
         }
         return false;
     }
-    public boolean login(String nombre, String password)throws IOException{
+
+    public boolean login(String nombre, String password) throws IOException {
         users.seek(0);
-        while(users.getFilePointer()<users.length()){
-            String user=users.readUTF();
-            String pass=users.readUTF();
-            if(user.equals(nombre) && pass.equals(password)){
+        while (users.getFilePointer() < users.length()) {
+            String user = users.readUTF();
+            String pass = users.readUTF();
+            users.readBoolean();
+            if (user.equals(nombre) && pass.equals(password)) {
                 return true;
-            }           
+            }
             users.readBoolean();
         }
         return false;
