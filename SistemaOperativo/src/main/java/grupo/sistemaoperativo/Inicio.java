@@ -31,8 +31,8 @@ public class Inicio {
         if (users.length() == 0) {
             users.writeUTF("PotasticPanda");
             users.writeUTF("123456789");
-            CreateUserFolder("PotasticPanda");
             users.writeBoolean(true);
+            CreateUserFolder("PotasticPanda");
 
         }
     }

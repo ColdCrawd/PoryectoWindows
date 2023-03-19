@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -209,7 +210,48 @@ public class TwiterCuenta {
         }
         return NumSeguidos;
     }
+    public void TweetsSeguidos() throws IOException{
+        int twets=0, total=0;
+        int n=0;
+        String[] seguidos=new String[ContarSeguidos()];
+        following.seek(0);
+        while(following.getFilePointer()<following.length()){
+            String usuario=following.readUTF();
+            if(following.readBoolean()){
+                total=total+ContarTweets(usuario);
+                seguidos[n]=usuario;
+                if(n+1!=ContarSeguidos()){
+                    n++;
+                }
+            }
+            following.readBoolean();
+        }
+        String[] tweets=new String[total];
+        n=0;
+        while(twets<total){
+            twits = new RandomAccessFile(UserFolder(seguidos[n]) + "/twits.twc", "rw");
+            twits.seek(0);
+            while(twits.getFilePointer()<twits.length()){
+                twits.readLong();
+                tweets[twets]=twits.readUTF();
+                twets++;
+            }
+            n++;
+        }      
+        
+    }
     
+    public int ContarTweets(String usuario) throws FileNotFoundException, IOException{
+        twits = new RandomAccessFile(UserFolder(usuario) + "/twits.twc", "rw");
+        twits.seek(0);
+        int n=0;
+        while(twits.getFilePointer()<twits.length()){
+            twits.readLong();
+            twits.readUTF();
+            n++;
+        }
+        return n;
+    }
     
     
 }
