@@ -181,6 +181,35 @@ public class TwiterCuenta {
         return false;
     }
     
+    public void addTweet(String texto) throws IOException{
+        twits = new RandomAccessFile(direccion + "/twits.twc", "rw");
+        twits.seek(twits.length());
+        twits.writeLong(Calendar.getInstance().getTimeInMillis());
+        twits.writeUTF(texto);
+    }
+    
+    public String seguidosUsers() throws IOException{
+        following.seek(0);
+        while(following.getFilePointer()<following.length()){
+            String User=following.readUTF();
+            if(following.readBoolean()){
+                return User;
+            }            
+        }
+        return null;
+    }
+    public int ContarSeguidos() throws IOException{
+        following.seek(0);
+        int NumSeguidos=0;
+        while(following.getFilePointer()<following.length()){
+            following.readUTF();
+            if(following.readBoolean()){
+                NumSeguidos++;
+            }
+        }
+        return NumSeguidos;
+    }
+    
     
     
 }
