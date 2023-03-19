@@ -15,27 +15,28 @@ import java.util.Calendar;
  * @author w
  */
 public class TwiterCuenta {
+
     private RandomAccessFile Userdoc;
     private RandomAccessFile following, followers, twits;
-    
+    private String usuarioActual, direccion;
+
     public TwiterCuenta() {
         try {
             File mi = new File("z");
             mi.mkdir();
-            File mu=new File("z/Twiter");
+            File mu = new File("z/Twiter");
             mu.mkdir();
-            Userdoc=new RandomAccessFile("z/Twiter/users.twe","rw");
-            
-            
-        }catch(IOException e){
-            
+            Userdoc = new RandomAccessFile("z/Twiter/users.twe", "rw");
+
+        } catch (IOException e) {
+
         }
     }
-    
-    public boolean addUser(String nombre, char genero, String Username, String password, int edad) throws IOException{
-        if(searchUser(Username)){
+
+    public boolean addUser(String nombre, char genero, String Username, String password, int edad) throws IOException {
+        if (searchUser(Username)) {
             return false;
-        }else{
+        } else {
             Userdoc.seek(Userdoc.length());
             Userdoc.writeUTF(nombre);
             Userdoc.writeChar(genero);
@@ -44,56 +45,142 @@ public class TwiterCuenta {
             Userdoc.writeLong(Calendar.getInstance().getTimeInMillis());
             Userdoc.writeInt(edad);
             Userdoc.writeBoolean(true);
+            usuarioActual = Username;
+            direccion = UserFolder(Username);
+            CreateUserFolder(Username);
+            ArchivosTwiter();
             return true;
         }
     }
-    public boolean searchUser(String Username) throws IOException{
+
+    private String UserFolder(String username) {
+        return "z/Twiter/" + username;
+    }
+
+    public boolean searchUser(String Username) throws IOException {
         Userdoc.seek(0);
-        while(Userdoc.getFilePointer()<Userdoc.length()){
-            long pos=Userdoc.getFilePointer();
+        while (Userdoc.getFilePointer() < Userdoc.length()) {
+            long pos = Userdoc.getFilePointer();
             Userdoc.readUTF();
             Userdoc.readChar();
-            String username=Userdoc.readUTF();
+            String username = Userdoc.readUTF();
             Userdoc.readUTF();
             Userdoc.readLong();
             Userdoc.readInt();
             Userdoc.readBoolean();
-            
-            if(Username.equalsIgnoreCase(username)){
+
+            if (Username.equalsIgnoreCase(username)) {
                 Userdoc.seek(pos);
                 return true;
             }
         }
         return false;
     }
-    
-    private String UserFolder(String username){
-        return "z/Twiter/"+username;
-    }
-    
-    public void CreateUserFolder(String Username) throws FileNotFoundException{
-        File U=new File(UserFolder(Username));
+
+    private void CreateUserFolder(String Username) throws FileNotFoundException {
+        File U = new File(UserFolder(Username));
         U.mkdir();
-        
-        following=new RandomAccessFile(UserFolder(Username)+"/following.twc","rw");
-        followers=new RandomAccessFile(UserFolder(Username)+"/followers.twc","rw");
-        twits=new RandomAccessFile(UserFolder(Username)+"/twits.twc","rw");        
     }
-    
-    public boolean Login(String Username, String password) throws IOException{
-        if(searchUser(Username)){
+
+    public void ArchivosTwiter() throws FileNotFoundException {
+        following = new RandomAccessFile(direccion + "/following.twc", "rw");
+        followers = new RandomAccessFile(direccion + "/followers.twc", "rw");
+        twits = new RandomAccessFile(direccion + "/twits.twc", "rw");
+    }
+
+    public boolean Login(String Username, String password) throws IOException {
+        if (searchUser(Username)) {
             Userdoc.readUTF();
             Userdoc.readChar();
             Userdoc.readUTF();
-            String Password=Userdoc.readUTF();
+            String Password = Userdoc.readUTF();
             Userdoc.readLong();
             Userdoc.readInt();
             Userdoc.readBoolean();
-            if(password.equals(Password)){
+            if (password.equals(Password)) {
+                usuarioActual = Username;
+                direccion = UserFolder(Username);
+                ArchivosTwiter();
                 return true;
             }
         }
         return false;
     }
+    
+    public void addSeguir(String usuario) throws IOException {
+        if (searchSeguidos(usuario)) {
+            following.readUTF();
+            long pos=following.getFilePointer();
+            if(following.readBoolean()){
+                
+            }else{
+                following.seek(pos);
+                following.writeBoolean(true);
+                addSeguidores(usuario);
+            }
+            
+        } else {
+            following.seek(following.length());
+            following.writeUTF(usuario);
+            following.writeBoolean(true);
+            addSeguidores(usuario);
+        }
+    }
+    public void dejarSeguir(String usuario) throws IOException{
+        if(searchSeguidos(usuario)){
+            following.readUTF();
+            following.writeBoolean(false);
+            dejarSeguidores(usuario);
+        }
+    }
 
+    public boolean searchSeguidos(String usuario) throws IOException {
+        following.seek(0);
+        while (following.getFilePointer() < following.length()) {
+            long pos=following.getFilePointer();
+            if (following.readUTF().equals(usuario)) {
+                following.seek(pos);
+                return true;
+            }
+            following.readBoolean();
+            
+        }
+        return false;
+    }
+
+    public void addSeguidores(String usuario) throws FileNotFoundException, IOException {
+        followers = new RandomAccessFile(UserFolder(usuario) + "/followers.twc", "rw");
+        if(searchSeguidores(usuarioActual)){
+            followers.readUTF();
+            followers.writeBoolean(true);
+        }else{
+            followers.seek(followers.length());
+            followers.writeUTF(usuario);
+            followers.writeBoolean(true);
+        }
+    }
+    
+    public void dejarSeguidores(String usuario) throws FileNotFoundException, IOException{
+        followers = new RandomAccessFile(UserFolder(usuario) + "/followers.twc", "rw");
+        if(searchSeguidores(usuarioActual)){
+            followers.readUTF();
+            followers.writeBoolean(false);
+        }
+    }
+    
+    public boolean searchSeguidores(String usuario) throws IOException{
+        followers.seek(0);
+        while(followers.getFilePointer()<followers.length()){
+            long pos=followers.getFilePointer();
+            if(followers.readUTF().equals(usuario)){
+                followers.seek(pos);
+                return true;
+            }
+            followers.readBoolean();
+        }
+        return false;
+    }
+    
+    
+    
 }
