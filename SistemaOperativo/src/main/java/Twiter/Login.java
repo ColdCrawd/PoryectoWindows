@@ -4,6 +4,11 @@
  */
 package Twiter;
 
+import grupo.sistemaoperativo.frmWindows;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Alejandro Reynaud
@@ -13,6 +18,8 @@ public class Login extends javax.swing.JFrame {
     /**
      * Creates new form Login
      */
+    static TwiterCuenta logic=new TwiterCuenta();
+    static PaginaPrincipal PP=new PaginaPrincipal();
     public Login() {
         initComponents();
     }
@@ -42,7 +49,11 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-        jPasswordField1.setText("jPasswordField1");
+        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField1ActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("Aceptar");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -90,8 +101,19 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        String valorPass = new String(jPasswordField1.getPassword());
+        try {
+            if(logic.Login(jTextField1.getText(), valorPass)){
+                PP.setVisible(true);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(frmWindows.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPasswordField1ActionPerformed
 
     /**
      * @param args the command line arguments

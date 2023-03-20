@@ -241,6 +241,10 @@ public class TwiterCuenta {
         
     }
     
+    public String tweets(String texto){
+        
+    }
+            
     public int ContarTweets(String usuario) throws FileNotFoundException, IOException{
         twits = new RandomAccessFile(UserFolder(usuario) + "/twits.twc", "rw");
         twits.seek(0);
